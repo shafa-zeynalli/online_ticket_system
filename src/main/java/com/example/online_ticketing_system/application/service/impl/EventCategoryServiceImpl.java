@@ -2,10 +2,13 @@ package com.example.online_ticketing_system.application.service.impl;
 
 import com.example.online_ticketing_system.application.dto.event.event_category.EventCategoryCreateDTO;
 import com.example.online_ticketing_system.application.dto.event.event_category.EventCategoryResponseDTO;
+import com.example.online_ticketing_system.application.dto.event.event_category.EventCategoryUpdateDTO;
 import com.example.online_ticketing_system.application.mapper.EventCategoryMapper;
 import com.example.online_ticketing_system.domain.model.EventCategory;
+import com.example.online_ticketing_system.domain.model.EventHall;
 import com.example.online_ticketing_system.domain.repository.EventCategoryRepository;
 import com.example.online_ticketing_system.domain.service.EventCategoryService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,11 +18,12 @@ import java.util.stream.Collectors;
 @Service
 public class EventCategoryServiceImpl implements EventCategoryService {
 
-    private EventCategoryMapper eventCategoryMapper;
+    private final EventCategoryMapper eventCategoryMapper;
     private final EventCategoryRepository eventCategoryRepository;
 
     @Autowired
-    public EventCategoryServiceImpl(EventCategoryRepository eventCategoryRepository) {
+    public EventCategoryServiceImpl(EventCategoryMapper eventCategoryMapper, EventCategoryRepository eventCategoryRepository) {
+        this.eventCategoryMapper = eventCategoryMapper;
         this.eventCategoryRepository = eventCategoryRepository;
     }
 
@@ -49,7 +53,22 @@ public class EventCategoryServiceImpl implements EventCategoryService {
     }
 
     @Override
+    public EventCategoryResponseDTO update(Long id, EventCategoryUpdateDTO eventCategoryUpdateDTO) {
+        EventCategory eventCategory = eventCategoryRepository.findById(id)
+                .orElseThrow(()->new EntityNotFoundException("Event category not found"));
+        return eventCategoryMapper.toResponseDTO(
+                eventCategoryRepository.save(
+                        eventCategoryMapper.updateEventCategoryFromDTO(eventCategoryUpdateDTO, eventCategory)
+                )
+        );
+    }
+
+    @Override
     public void delete(Long id) {
-        eventCategoryRepository.delete(id);
+        EventCategory eventCategory = eventCategoryRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Event Category not found!"));
+        if (eventCategory.getDeletedAt() != null) {
+            throw new IllegalStateException("Event Category already deleted");
+        }
+        eventCategoryRepository.delete(eventCategory.getId());
     }
 }

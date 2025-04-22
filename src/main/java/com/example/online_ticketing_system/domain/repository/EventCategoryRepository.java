@@ -10,5 +10,6 @@ public interface EventCategoryRepository {
     Optional<EventCategory> findById(Long id);
     List<EventCategory> findAll();
     EventCategory findByName(String name);
+    EventCategory update(Long id, EventCategory eventCategory);
     void delete(Long id);
 }

@@ -5,6 +5,7 @@ import com.example.online_ticketing_system.application.dto.event.event_hall.Even
 import com.example.online_ticketing_system.application.dto.event.event_hall.EventHallResponseDTO;
 import com.example.online_ticketing_system.application.dto.event.event_hall.EventHallUpdateDTO;
 import com.example.online_ticketing_system.domain.service.EventHallService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -40,7 +41,8 @@ public class EventHallController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
          eventHallService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

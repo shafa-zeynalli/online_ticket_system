@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface EventHallRepository {
-    EventHall save(EventHall event);
+    EventHall save(EventHall eventHall);
     Optional<EventHall> findById(Long id);
     List<EventHall> findAll();
     void delete(Long id);
     EventHall findByName(String name);
-    EventHall update(Long id, EventHall dto);
+    EventHall update(Long id, EventHall eventHall);
 
 }

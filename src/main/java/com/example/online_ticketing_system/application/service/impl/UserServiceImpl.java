@@ -81,6 +81,6 @@ public class UserServiceImpl implements UserService {
         if (user.getDeletedAt() != null) {
             throw new IllegalStateException("User already deleted");
         }
-        userRepository.deleteById(id);
+        userRepository.deleteById(user.getId());
     }
 }

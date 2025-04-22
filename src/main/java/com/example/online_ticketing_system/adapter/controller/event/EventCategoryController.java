@@ -4,12 +4,14 @@ package com.example.online_ticketing_system.adapter.controller.event;
 import com.example.online_ticketing_system.application.dto.event.event_category.EventCategoryCreateDTO;
 import com.example.online_ticketing_system.application.dto.event.event_category.EventCategoryResponseDTO;
 import com.example.online_ticketing_system.application.dto.event.event_category.EventCategoryUpdateDTO;
-import com.example.online_ticketing_system.application.dto.event.event_hall.EventHallResponseDTO;
 import com.example.online_ticketing_system.application.mapper.EventCategoryMapper;
 import com.example.online_ticketing_system.domain.repository.EventCategoryRepository;
+import com.example.online_ticketing_system.domain.service.EventCategoryService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -18,30 +20,38 @@ public class EventCategoryController {
 
     private final EventCategoryMapper eventCategoryMapper;
 
-    private final EventCategoryRepository eventCategoryRepository;
+    private final EventCategoryService eventCategoryService;
 
-    public EventCategoryController(EventCategoryMapper eventCategoryMapper, EventCategoryRepository eventCategoryRepository) {
+    public EventCategoryController(EventCategoryMapper eventCategoryMapper, EventCategoryService eventCategoryRepository) {
         this.eventCategoryMapper = eventCategoryMapper;
-        this.eventCategoryRepository = eventCategoryRepository;
+        this.eventCategoryService = eventCategoryRepository;
     }
 
     @GetMapping
     public List<EventCategoryResponseDTO> getAll() {
-        return eventCategoryRepository.findAll().stream().map(eventCategoryMapper::toResponseDTO).collect(Collectors.toList());
+        return eventCategoryService.findAll();
     }
 
     @GetMapping("/{id}")
     public EventCategoryResponseDTO findById(@PathVariable Long id) {
-        return eventCategoryRepository.findById(id).map(eventCategoryMapper::toResponseDTO).orElse(null);
+        return Optional.ofNullable(eventCategoryService.findById(id)).map(eventCategoryMapper::toResponseDTO).orElse(null);
     }
 
     @PostMapping
     public EventCategoryResponseDTO create(@RequestBody EventCategoryCreateDTO eventCategoryCreateDTO) {
         return eventCategoryMapper.toResponseDTO(
-                eventCategoryRepository.save(
-                    eventCategoryMapper.toEntity(eventCategoryCreateDTO)
-                )
+                eventCategoryService.save(eventCategoryCreateDTO)
             );
+    }
+    @PutMapping("/{id}")
+    public EventCategoryResponseDTO update(@PathVariable Long id, @RequestBody EventCategoryUpdateDTO eventCategoryUpdateDTO) {
+        return eventCategoryService.update(id, eventCategoryUpdateDTO);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        eventCategoryService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 
 
