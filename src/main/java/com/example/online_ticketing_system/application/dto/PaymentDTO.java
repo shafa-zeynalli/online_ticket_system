@@ -1,5 +1,6 @@
 package com.example.online_ticketing_system.application.dto;
 
+import com.example.online_ticketing_system.application.dto.ticket.TicketResponseDTO;
 import com.example.online_ticketing_system.domain.enums.PaymentMethod;
 import com.example.online_ticketing_system.domain.enums.PaymentStatus;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class PaymentDTO {
     private BigDecimal amount;
     private LocalDateTime paidAt;
 
-    private TicketDTO ticket;
+    private TicketResponseDTO ticket;
     private PaymentMethod method;
     private PaymentStatus status;
  }

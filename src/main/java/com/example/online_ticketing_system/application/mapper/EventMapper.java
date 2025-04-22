@@ -12,8 +12,8 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface EventMapper {
 
-    @Mapping(source = "eventCategory.name", target = "eventCategoryName")
-    @Mapping(source = "eventHall.name", target = "eventHallName")
+    @Mapping(source = "eventCategory", target = "eventCategory")
+    @Mapping(source = "eventHall", target = "eventHall")
     EventResponseDTO toResponseDTO(Event event);
 
     Event toEntity(EventCreateDTO eventDTO);

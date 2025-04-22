@@ -45,9 +45,7 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return Optional.ofNullable(userJpaRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found")));
-
+        return userJpaRepository.findByUsername(username);
     }
 
 }
