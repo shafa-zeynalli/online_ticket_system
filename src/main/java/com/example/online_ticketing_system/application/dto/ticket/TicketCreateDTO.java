@@ -21,9 +21,8 @@ public class TicketCreateDTO {
     private Integer seatNumber;
     private String qrCode;
 
-    private EventResponseDTO event;
-    private UserResponseDTO user;
-    private EventTicketTypeResponseDTO ticketType;
+    private Long eventId;
+    private Long ticketTypeId;
 
     private TicketStatus status;
 }

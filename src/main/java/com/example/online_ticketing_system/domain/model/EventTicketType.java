@@ -2,9 +2,7 @@ package com.example.online_ticketing_system.domain.model;
 
 
 import com.example.online_ticketing_system.domain.enums.TicketType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,6 +24,7 @@ public class EventTicketType extends BaseEntity {
     private TicketType ticketType;
 
     @ManyToOne
+    @JoinColumn(name = "event_id")
     private Event event;
 }
 

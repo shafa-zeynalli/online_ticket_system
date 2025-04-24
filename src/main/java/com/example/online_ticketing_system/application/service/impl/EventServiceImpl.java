@@ -76,9 +76,9 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public EventResponseDTO update(Long eventId ,EventUpdateDTO eventUpdateDTO) {
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User currentUser = userRepository.findByUsername(username)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found!"));
+//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+//        User currentUser = userRepository.findByUsername(username)
+//                .orElseThrow(()-> new UsernameNotFoundException("User not found!"));
 
         Event existingEvent = eventRepository.findById(eventId)
                 .orElseThrow(()-> new EntityNotFoundException("Event not found!"));

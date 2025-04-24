@@ -22,9 +22,9 @@ public class TicketUpdateDTO {
     private Integer seatNumber;
     private String qrCode;
 
-    private EventResponseDTO event;
-    private UserResponseDTO user;
-    private EventTicketTypeResponseDTO ticketType;
+    private Long eventId;
+//    private UserResponseDTO user;
+    private Long ticketTypeId;
 
     private TicketStatus status;
 }
