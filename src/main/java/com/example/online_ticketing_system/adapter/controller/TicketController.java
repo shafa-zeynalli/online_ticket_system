@@ -4,21 +4,20 @@ package com.example.online_ticketing_system.adapter.controller;
 import com.example.online_ticketing_system.application.dto.ticket.TicketCreateDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketResponseDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketUpdateDTO;
-import com.example.online_ticketing_system.application.mapper.TicketMapper;
 import com.example.online_ticketing_system.domain.service.TicketService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/tickets")
 public class TicketController {
 
-    private final TicketMapper ticketMapper;
     private final TicketService ticketService;
 
-    public TicketController(TicketMapper ticketMapper, TicketService ticketService) {
-        this.ticketMapper = ticketMapper;
+    public TicketController(TicketService ticketService) {
         this.ticketService = ticketService;
     }
 
@@ -30,6 +29,11 @@ public class TicketController {
     @GetMapping("/{id}")
     public TicketResponseDTO getTicket(@PathVariable("id") Long id) {
         return ticketService.findTicketById(id).orElse(null);
+    }
+
+    @GetMapping("/grouped-by-status")
+    public ResponseEntity<Map<String, List<TicketResponseDTO>>> getTicketsGroupedByStatus() {
+        return ResponseEntity.ok(ticketService.getTicketsGroupedByStatus());
     }
 
     @PostMapping

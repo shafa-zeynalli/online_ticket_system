@@ -4,6 +4,7 @@ import com.example.online_ticketing_system.application.dto.ticket.TicketCreateDT
 import com.example.online_ticketing_system.application.dto.ticket.TicketResponseDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketUpdateDTO;
 import com.example.online_ticketing_system.application.mapper.TicketMapper;
+import com.example.online_ticketing_system.domain.enums.TicketStatus;
 import com.example.online_ticketing_system.domain.model.Event;
 import com.example.online_ticketing_system.domain.model.EventTicketType;
 import com.example.online_ticketing_system.domain.model.Ticket;
@@ -14,10 +15,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -96,7 +94,9 @@ public class TicketServiceImpl implements TicketService {
         Map<String, List<TicketResponseDTO>> ticketsByStatus = new HashMap<>();
 
         for (Ticket ticket : tickets) {
-
+            TicketStatus status = ticket.getStatus();
+            ticketsByStatus.computeIfAbsent(status.name(), k -> new ArrayList<>()).add(ticketMapper.toDTO(ticket));
         }
+        return ticketsByStatus;
     }
 }
