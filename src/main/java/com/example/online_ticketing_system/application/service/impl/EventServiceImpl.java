@@ -4,6 +4,8 @@ import com.example.online_ticketing_system.application.dto.event.EventCreateDTO;
 import com.example.online_ticketing_system.application.dto.event.EventResponseDTO;
 import com.example.online_ticketing_system.application.dto.event.EventUpdateDTO;
 import com.example.online_ticketing_system.application.mapper.EventMapper;
+import com.example.online_ticketing_system.domain.exception.AlreadyDeletedException;
+import com.example.online_ticketing_system.domain.exception.ResourceNotFoundException;
 import com.example.online_ticketing_system.domain.model.Event;
 import com.example.online_ticketing_system.domain.model.EventCategory;
 import com.example.online_ticketing_system.domain.model.EventHall;
@@ -57,13 +59,13 @@ public class EventServiceImpl implements EventService {
     public EventResponseDTO create(EventCreateDTO eventCreateDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByUsername(username)
-                .orElseThrow(()-> new UsernameNotFoundException("User not found!"));
+                .orElseThrow(()-> new ResourceNotFoundException("User not found!"));
 
         EventCategory category = eventCategoryRepository.findById(eventCreateDTO.getEventCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Event category not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event category not found!"));
 
         EventHall hall = eventHallRepository.findById(eventCreateDTO.getEventHallId())
-                .orElseThrow(() -> new EntityNotFoundException("Event hall not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event hall not found!"));
 
         Event event = eventMapper.toEntity(eventCreateDTO);
         event.setCreatedBy(currentUser);
@@ -81,13 +83,13 @@ public class EventServiceImpl implements EventService {
 //                .orElseThrow(()-> new UsernameNotFoundException("User not found!"));
 
         Event existingEvent = eventRepository.findById(eventId)
-                .orElseThrow(()-> new EntityNotFoundException("Event not found!"));
+                .orElseThrow(()-> new ResourceNotFoundException("Event not found!"));
 
         EventCategory category = eventCategoryRepository.findById(eventUpdateDTO.getEventCategoryId())
-                .orElseThrow(() -> new EntityNotFoundException("Event category not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event category not found!"));
 
         EventHall hall = eventHallRepository.findById(eventUpdateDTO.getEventHallId())
-                .orElseThrow(() -> new EntityNotFoundException("Event hall not found!"));
+                .orElseThrow(() -> new ResourceNotFoundException("Event hall not found!"));
 
         eventMapper.updateEntityFromDTO(eventUpdateDTO, existingEvent);
 
@@ -99,9 +101,10 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public void delete(Long id) {
-        Event event = eventRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event not found!"));
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found!"));
         if (event.getDeletedAt() != null) {
-            throw new IllegalStateException("Event already deleted");
+            throw new AlreadyDeletedException("Event already deleted");
         }
         eventRepository.delete(event.getId());
     }

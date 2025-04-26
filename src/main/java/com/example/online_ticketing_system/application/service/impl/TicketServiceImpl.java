@@ -5,6 +5,8 @@ import com.example.online_ticketing_system.application.dto.ticket.TicketResponse
 import com.example.online_ticketing_system.application.dto.ticket.TicketUpdateDTO;
 import com.example.online_ticketing_system.application.mapper.TicketMapper;
 import com.example.online_ticketing_system.domain.enums.TicketStatus;
+import com.example.online_ticketing_system.domain.exception.AlreadyDeletedException;
+import com.example.online_ticketing_system.domain.exception.ResourceNotFoundException;
 import com.example.online_ticketing_system.domain.model.Event;
 import com.example.online_ticketing_system.domain.model.EventTicketType;
 import com.example.online_ticketing_system.domain.model.Ticket;
@@ -50,10 +52,13 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public TicketResponseDTO saveTicket(TicketCreateDTO ticketCreateDTO) {
-        Event event = eventRepository.findById(ticketCreateDTO.getEventId()).orElseThrow(() -> new EntityNotFoundException("Event not found!"));
+        Event event = eventRepository.findById(ticketCreateDTO.getEventId())
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found!"));
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new EntityNotFoundException("User not found!"));
-        EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketCreateDTO.getTicketTypeId()).orElseThrow(() -> new EntityNotFoundException("Ticket type not found!"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(()-> new ResourceNotFoundException("User not found!"));
+        EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketCreateDTO.getTicketTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket type not found!"));
 
         Ticket ticket = ticketMapper.toEntity(ticketCreateDTO);
         ticket.setUser(user);
@@ -66,11 +71,15 @@ public class TicketServiceImpl implements TicketService {
     @Override
     public TicketResponseDTO updateTicket(Long id, TicketUpdateDTO ticketUpdateDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new EntityNotFoundException("User not found!"));
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(()-> new ResourceNotFoundException("User not found!"));
 
-        Ticket currentTicket = ticketRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ticket not found!"));
-        Event event = eventRepository.findById(ticketUpdateDTO.getEventId()).orElseThrow(() -> new EntityNotFoundException("Event not found!"));
-        EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketUpdateDTO.getTicketTypeId()).orElseThrow(() -> new EntityNotFoundException("Ticket type not found!"));
+        Ticket currentTicket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found!"));
+        Event event = eventRepository.findById(ticketUpdateDTO.getEventId())
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found!"));
+        EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketUpdateDTO.getTicketTypeId())
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket type not found!"));
         ticketMapper.updateEntityFromDTO(ticketUpdateDTO,currentTicket);
 
         currentTicket.setEvent(event);
@@ -81,9 +90,10 @@ public class TicketServiceImpl implements TicketService {
 
     @Override
     public void deleteTicket(Long id) {
-        Ticket ticket = ticketRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Ticket not found!"));
+        Ticket ticket = ticketRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Ticket not found!"));
         if (ticket.getDeletedAt() != null) {
-            throw new EntityNotFoundException("Ticket deleted at " + ticket.getDeletedAt());
+            throw new AlreadyDeletedException("Ticket deleted at " + ticket.getDeletedAt());
         }
         ticketRepository.delete(ticket);
     }

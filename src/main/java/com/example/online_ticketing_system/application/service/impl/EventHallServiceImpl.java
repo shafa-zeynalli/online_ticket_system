@@ -5,6 +5,8 @@ import com.example.online_ticketing_system.application.dto.event.event_hall.Even
 import com.example.online_ticketing_system.application.dto.event.event_hall.EventHallResponseDTO;
 import com.example.online_ticketing_system.application.dto.event.event_hall.EventHallUpdateDTO;
 import com.example.online_ticketing_system.application.mapper.EventHallMapper;
+import com.example.online_ticketing_system.domain.exception.AlreadyDeletedException;
+import com.example.online_ticketing_system.domain.exception.ResourceNotFoundException;
 import com.example.online_ticketing_system.domain.model.EventHall;
 import com.example.online_ticketing_system.domain.repository.EventHallRepository;
 import com.example.online_ticketing_system.domain.service.EventHallService;
@@ -64,9 +66,10 @@ public class EventHallServiceImpl implements EventHallService {
 
     @Override
     public void delete(Long id) {
-        EventHall eventHall = eventHallRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Event Hall not found!"));
+        EventHall eventHall = eventHallRepository.findById(id)
+                .orElseThrow(()->new ResourceNotFoundException("Event Hall not found!"));
         if (eventHall.getDeletedAt() != null) {
-            throw new IllegalStateException("Event Hall already deleted");
+            throw new AlreadyDeletedException("Event Hall already deleted");
         }
         eventHallRepository.delete(eventHall.getId());
     }

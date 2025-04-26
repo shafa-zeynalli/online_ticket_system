@@ -4,6 +4,8 @@ import com.example.online_ticketing_system.application.dto.event.event_category.
 import com.example.online_ticketing_system.application.dto.event.event_category.EventCategoryResponseDTO;
 import com.example.online_ticketing_system.application.dto.event.event_category.EventCategoryUpdateDTO;
 import com.example.online_ticketing_system.application.mapper.EventCategoryMapper;
+import com.example.online_ticketing_system.domain.exception.AlreadyDeletedException;
+import com.example.online_ticketing_system.domain.exception.ResourceNotFoundException;
 import com.example.online_ticketing_system.domain.model.EventCategory;
 import com.example.online_ticketing_system.domain.model.EventHall;
 import com.example.online_ticketing_system.domain.repository.EventCategoryRepository;
@@ -55,7 +57,7 @@ public class EventCategoryServiceImpl implements EventCategoryService {
     @Override
     public EventCategoryResponseDTO update(Long id, EventCategoryUpdateDTO eventCategoryUpdateDTO) {
         EventCategory eventCategory = eventCategoryRepository.findById(id)
-                .orElseThrow(()->new EntityNotFoundException("Event category not found"));
+                .orElseThrow(()->new ResourceNotFoundException("Event category not found"));
         return eventCategoryMapper.toResponseDTO(
                 eventCategoryRepository.save(
                         eventCategoryMapper.updateEventCategoryFromDTO(eventCategoryUpdateDTO, eventCategory)
@@ -65,9 +67,9 @@ public class EventCategoryServiceImpl implements EventCategoryService {
 
     @Override
     public void delete(Long id) {
-        EventCategory eventCategory = eventCategoryRepository.findById(id).orElseThrow(()->new EntityNotFoundException("Event Category not found!"));
+        EventCategory eventCategory = eventCategoryRepository.findById(id).orElseThrow(()->new ResourceNotFoundException("Event Category not found!"));
         if (eventCategory.getDeletedAt() != null) {
-            throw new IllegalStateException("Event Category already deleted");
+            throw new AlreadyDeletedException("Event Category already deleted");
         }
         eventCategoryRepository.delete(eventCategory.getId());
     }

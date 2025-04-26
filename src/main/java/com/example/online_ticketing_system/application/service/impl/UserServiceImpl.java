@@ -4,6 +4,8 @@ import com.example.online_ticketing_system.application.dto.user.UserCreateDTO;
 import com.example.online_ticketing_system.application.dto.user.UserResponseDTO;
 import com.example.online_ticketing_system.application.dto.user.UserUpdateDTO;
 import com.example.online_ticketing_system.application.mapper.UserMapper;
+import com.example.online_ticketing_system.domain.exception.AlreadyDeletedException;
+import com.example.online_ticketing_system.domain.exception.ResourceNotFoundException;
 import com.example.online_ticketing_system.domain.model.User;
 import com.example.online_ticketing_system.domain.repository.UserRepository;
 import com.example.online_ticketing_system.domain.service.UserService;
@@ -23,6 +25,8 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
 
     //eslinde burda UserRepository nin hazirda yalniz 1 implementasiyasi var biz ondan istifade edirik dolayi yolla
+    //interface istifade etmeyimizin sebebi ise budu ki sabah bunun impl-si deyishmeli olsa biz burdaki kodlari deyishmek
+    // mecburiyyetimiz olmayacsaq cunki
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -49,7 +53,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO updateUser(Long id, UserUpdateDTO userUpdateDTO) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         userMapper.updateUserFromDTO(userUpdateDTO,user);
         if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
@@ -68,7 +72,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponseDTO findByUsername(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         return userMapper.toDto(user);
     }
@@ -76,10 +80,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("User not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         if (user.getDeletedAt() != null) {
-            throw new IllegalStateException("User already deleted");
+            throw new AlreadyDeletedException("User already deleted");
         }
         userRepository.deleteById(user.getId());
     }

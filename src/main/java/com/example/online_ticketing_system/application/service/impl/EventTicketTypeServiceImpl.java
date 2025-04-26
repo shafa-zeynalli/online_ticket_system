@@ -4,6 +4,8 @@ import com.example.online_ticketing_system.application.dto.ticket.ticket_type.Ev
 import com.example.online_ticketing_system.application.dto.ticket.ticket_type.EventTicketTypeResponseDTO;
 import com.example.online_ticketing_system.application.dto.ticket.ticket_type.EventTicketTypeUpdateDTO;
 import com.example.online_ticketing_system.application.mapper.EventTicketTypeMapper;
+import com.example.online_ticketing_system.domain.exception.AlreadyDeletedException;
+import com.example.online_ticketing_system.domain.exception.ResourceNotFoundException;
 import com.example.online_ticketing_system.domain.model.Event;
 import com.example.online_ticketing_system.domain.model.EventTicketType;
 import com.example.online_ticketing_system.domain.repository.EventRepository;
@@ -38,7 +40,8 @@ public class EventTicketTypeServiceImpl implements EventTicketTypeService {
 
     @Override
     public EventTicketTypeResponseDTO create(EventTicketTypeCreateDTO eventTicketTypeCreateDTO) {
-        Event event = eventRepository.findById(eventTicketTypeCreateDTO.getEventId()).orElseThrow(() -> new EntityNotFoundException("Event not found"));
+        Event event = eventRepository.findById(eventTicketTypeCreateDTO.getEventId())
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         EventTicketType eventTicketType = eventTicketTypeMapper.toEntity(eventTicketTypeCreateDTO);
         eventTicketType.setEvent(event);
         return eventTicketTypeMapper.toDTO(
@@ -58,17 +61,20 @@ public class EventTicketTypeServiceImpl implements EventTicketTypeService {
 
     @Override
     public void deleteById(Long id) {
-        EventTicketType eventTicketType = eventTicketTypeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event ticket type not found!"));
+        EventTicketType eventTicketType = eventTicketTypeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event ticket type not found!"));
         if (eventTicketType.getDeletedAt() != null) {
-            throw new EntityNotFoundException("Event ticket type already deleted!");
+            throw new AlreadyDeletedException("Event ticket type already deleted!");
         }        
         eventTicketTypeRepository.delete(eventTicketType.getId());
     }
 
     @Override
     public EventTicketTypeResponseDTO update(Long id, EventTicketTypeUpdateDTO eventTicketType) {
-        EventTicketType currentEventTicketType = eventTicketTypeRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Event ticket type not found!"));
-        Event event = eventRepository.findById(eventTicketType.getEventId()).orElseThrow(() -> new EntityNotFoundException("Event not found!"));
+        EventTicketType currentEventTicketType = eventTicketTypeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Event ticket type not found!"));
+        Event event = eventRepository.findById(eventTicketType.getEventId())
+                .orElseThrow(() -> new ResourceNotFoundException("Event not found!"));
         eventTicketTypeMapper.updateDTO(eventTicketType, currentEventTicketType);
         currentEventTicketType.setEvent(event);
         return eventTicketTypeMapper.toDTO(eventTicketTypeRepository.save(currentEventTicketType));

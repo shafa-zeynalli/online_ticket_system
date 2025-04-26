@@ -2,6 +2,8 @@ package com.example.online_ticketing_system.application.service.impl;
 
 import com.example.online_ticketing_system.application.dto.seat_lock.SeatLockCreateDTO;
 import com.example.online_ticketing_system.application.mapper.SeatLockMapper;
+import com.example.online_ticketing_system.domain.exception.ResourceNotFoundException;
+import com.example.online_ticketing_system.domain.exception.SeatAlreadyLockedException;
 import com.example.online_ticketing_system.domain.model.Event;
 import com.example.online_ticketing_system.domain.model.SeatLock;
 import com.example.online_ticketing_system.domain.model.User;
@@ -40,13 +42,13 @@ public class SeatLockServiceImpl implements SeatLockService {
     @Override
     public void lockSeat(SeatLockCreateDTO dto) {
         if (isSeatLocked(dto.getSeatNumber(), dto.getEventId())) {
-            throw new RuntimeException("Seat already locked");
+            throw new SeatAlreadyLockedException("Seat already locked");
         }
         SeatLock seatLock = seatLockMapper.toEntity(dto);
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new RuntimeException("User not found"));
-        Event event = eventRepository.findById(dto.getEventId()).orElseThrow(() -> new RuntimeException("Event not found"));
+        User user = userRepository.findByUsername(username).orElseThrow(()-> new ResourceNotFoundException("User not found"));
+        Event event = eventRepository.findById(dto.getEventId()).orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         seatLock.setEvent(event);
         seatLock.setUser(user);
         seatLock.setLockedAt(LocalDateTime.now());
