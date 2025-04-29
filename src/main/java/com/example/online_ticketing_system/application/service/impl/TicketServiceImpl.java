@@ -1,22 +1,26 @@
 package com.example.online_ticketing_system.application.service.impl;
 
+import com.example.online_ticketing_system.application.dto.seat_lock.SeatLockCreateDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketCreateDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketResponseDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketUpdateDTO;
 import com.example.online_ticketing_system.application.mapper.TicketMapper;
+import com.example.online_ticketing_system.domain.enums.SeatLockStatus;
 import com.example.online_ticketing_system.domain.enums.TicketStatus;
 import com.example.online_ticketing_system.domain.exception.AlreadyDeletedException;
 import com.example.online_ticketing_system.domain.exception.ResourceNotFoundException;
+import com.example.online_ticketing_system.domain.exception.SeatAlreadyLockedException;
 import com.example.online_ticketing_system.domain.model.Event;
 import com.example.online_ticketing_system.domain.model.EventTicketType;
 import com.example.online_ticketing_system.domain.model.Ticket;
 import com.example.online_ticketing_system.domain.model.User;
 import com.example.online_ticketing_system.domain.repository.*;
+import com.example.online_ticketing_system.domain.service.SeatLockService;
 import com.example.online_ticketing_system.domain.service.TicketService;
-import jakarta.persistence.EntityNotFoundException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -28,16 +32,18 @@ public class TicketServiceImpl implements TicketService {
     private final EventRepository eventRepository;
     private final UserRepository userRepository;
     private final EventTicketTypeRepository eventTicketTypeRepository;
+    private final SeatLockService seatLockService;
 
     public TicketServiceImpl(TicketMapper ticketMapper,
                              TicketRepository ticketRepository,
                              EventRepository eventRepository, UserRepository userRepository,
-                             EventTicketTypeRepository eventTicketTypeRepository) {
+                             EventTicketTypeRepository eventTicketTypeRepository, SeatLockService seatLockService) {
         this.ticketMapper = ticketMapper;
         this.ticketRepository = ticketRepository;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
         this.eventTicketTypeRepository = eventTicketTypeRepository;
+        this.seatLockService = seatLockService;
     }
 
     @Override
@@ -60,10 +66,27 @@ public class TicketServiceImpl implements TicketService {
         EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketCreateDTO.getTicketTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket type not found!"));
 
+        if (seatLockService.isSeatLocked(ticketCreateDTO.getSeatNumber(), ticketCreateDTO.getEventId())) {
+            throw new SeatAlreadyLockedException("Seat is already locked for this event!");
+        }
+
         Ticket ticket = ticketMapper.toEntity(ticketCreateDTO);
         ticket.setUser(user);
         ticket.setTicketType(eventTicketType);
         ticket.setEvent(event);
+        ticket.setPurchaseDate(LocalDateTime.now());
+
+        SeatLockCreateDTO seatLockCreateDTO = SeatLockCreateDTO.builder()
+                .seatNumber(ticketCreateDTO.getSeatNumber())
+                .eventId(ticketCreateDTO.getEventId())
+                .reason("Ticket Reservation")
+                .userId(user.getId())
+                .lockedAt(LocalDateTime.now())
+                .expiresAt(LocalDateTime.now().plusMinutes(1))
+                .status(SeatLockStatus.LOCKED)
+                .build();
+
+        seatLockService.lockSeat(seatLockCreateDTO, user);
 
         return ticketMapper.toDTO(ticketRepository.save(ticket));
     }
@@ -80,10 +103,16 @@ public class TicketServiceImpl implements TicketService {
                 .orElseThrow(() -> new ResourceNotFoundException("Event not found!"));
         EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketUpdateDTO.getTicketTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket type not found!"));
+
+        if (seatLockService.isSeatLocked(ticketUpdateDTO.getSeatNumber(), currentTicket.getEvent().getId())) {
+            throw new SeatAlreadyLockedException("Seat is already locked for this event!");
+        }
+
         ticketMapper.updateEntityFromDTO(ticketUpdateDTO,currentTicket);
 
         currentTicket.setEvent(event);
         currentTicket.setTicketType(eventTicketType);
+        currentTicket.setPurchaseDate(LocalDateTime.now());
 
         return  ticketMapper.toDTO(ticketRepository.save(currentTicket));
     }
@@ -92,6 +121,7 @@ public class TicketServiceImpl implements TicketService {
     public void deleteTicket(Long id) {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found!"));
+        seatLockService.unlockSeat(ticket.getSeatNumber(),ticket.getEvent().getId(),ticket.getUser().getId());
         if (ticket.getDeletedAt() != null) {
             throw new AlreadyDeletedException("Ticket deleted at " + ticket.getDeletedAt());
         }

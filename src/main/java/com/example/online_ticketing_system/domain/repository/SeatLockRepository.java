@@ -11,5 +11,6 @@ public interface SeatLockRepository {
     Optional<SeatLock> findBySeatNumberAndEventAndUser(Integer seatNumber, Long eventId, Long userId);
     void save(SeatLock seatLock);
     void delete(SeatLock seatLock);
+    void deleteAll(List<SeatLock> seatLocks);
     List<SeatLock> findExpiredLocks(LocalDateTime now);
 }

@@ -1,4 +1,4 @@
-package com.example.online_ticketing_system.application.state;
+package com.example.online_ticketing_system.application.validator;
 
 import com.example.online_ticketing_system.domain.enums.TicketStatus;
 

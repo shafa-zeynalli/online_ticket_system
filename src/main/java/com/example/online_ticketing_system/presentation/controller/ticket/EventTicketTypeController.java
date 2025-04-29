@@ -1,4 +1,4 @@
-package com.example.online_ticketing_system.adapter.controller;
+package com.example.online_ticketing_system.presentation.controller.ticket;
 
 
 import com.example.online_ticketing_system.application.dto.ticket.ticket_type.EventTicketTypeCreateDTO;

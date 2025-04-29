@@ -1,4 +1,4 @@
-package com.example.online_ticketing_system.application.state;
+package com.example.online_ticketing_system.application.validator;
 
 
 //Finite State Machine Logic

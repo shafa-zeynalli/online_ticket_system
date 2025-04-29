@@ -9,27 +9,26 @@ import com.example.online_ticketing_system.domain.model.SeatLock;
 import com.example.online_ticketing_system.domain.model.User;
 import com.example.online_ticketing_system.domain.repository.EventRepository;
 import com.example.online_ticketing_system.domain.repository.SeatLockRepository;
-import com.example.online_ticketing_system.domain.repository.UserRepository;
 import com.example.online_ticketing_system.domain.service.SeatLockService;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
-
+@Transactional
 public class SeatLockServiceImpl implements SeatLockService {
 
     private final SeatLockRepository seatLockRepository;
     private final SeatLockMapper seatLockMapper;
-    private final UserRepository userRepository;
     private final EventRepository eventRepository;
 
-    public SeatLockServiceImpl(SeatLockRepository seatLockRepository, SeatLockMapper seatLockMapper, UserRepository userRepository, EventRepository eventRepository) {
+    public SeatLockServiceImpl(SeatLockRepository seatLockRepository,
+                               SeatLockMapper seatLockMapper,
+                               EventRepository eventRepository) {
         this.seatLockRepository = seatLockRepository;
         this.seatLockMapper = seatLockMapper;
-        this.userRepository = userRepository;
         this.eventRepository = eventRepository;
     }
 
@@ -40,19 +39,17 @@ public class SeatLockServiceImpl implements SeatLockService {
     }
 
     @Override
-    public void lockSeat(SeatLockCreateDTO dto) {
+    public void lockSeat(SeatLockCreateDTO dto, @AuthenticationPrincipal User user) {
         if (isSeatLocked(dto.getSeatNumber(), dto.getEventId())) {
             throw new SeatAlreadyLockedException("Seat already locked");
         }
         SeatLock seatLock = seatLockMapper.toEntity(dto);
 
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepository.findByUsername(username).orElseThrow(()-> new ResourceNotFoundException("User not found"));
         Event event = eventRepository.findById(dto.getEventId()).orElseThrow(() -> new ResourceNotFoundException("Event not found"));
         seatLock.setEvent(event);
         seatLock.setUser(user);
         seatLock.setLockedAt(LocalDateTime.now());
-        seatLock.setExpiresAt(LocalDateTime.now().plusMinutes(15));
+        seatLock.setExpiresAt(LocalDateTime.now().plusMinutes(1));
         seatLock.setReason("Temporary");
 
         seatLockRepository.save(seatLock);

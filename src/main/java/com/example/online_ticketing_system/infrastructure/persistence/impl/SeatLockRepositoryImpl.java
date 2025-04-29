@@ -5,6 +5,8 @@ import com.example.online_ticketing_system.domain.repository.SeatLockRepository;
 import com.example.online_ticketing_system.domain.service.SeatLockService;
 import com.example.online_ticketing_system.infrastructure.persistence.repository.SeatLockJpaRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -38,7 +40,15 @@ public class SeatLockRepositoryImpl implements SeatLockRepository {
     }
 
     @Override
-    public List<SeatLock> findExpiredLocks(LocalDateTime now) {
+    public void deleteAll(List<SeatLock> seatLocks) {
+        jpaRepository.deleteAll(seatLocks);
+    }
+
+    @Override
+    @Query("SELECT sl FROM SeatLock sl WHERE sl.expiresAt < :now AND sl.status='LOCKED' ")
+    public List<SeatLock> findExpiredLocks(@Param("now") LocalDateTime now) {
         return jpaRepository.findAllByExpiresAtBefore(now);
     }
+
+
 }

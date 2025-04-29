@@ -1,8 +1,7 @@
 package com.example.online_ticketing_system.application.dto.seat_lock;
 
 
-import com.example.online_ticketing_system.domain.model.Event;
-import com.example.online_ticketing_system.domain.model.User;
+import com.example.online_ticketing_system.domain.enums.SeatLockStatus;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -19,4 +18,5 @@ public class SeatLockCreateDTO {
     private LocalDateTime lockedAt;
     private LocalDateTime expiresAt;
     private String reason;
+    private SeatLockStatus status;
 }

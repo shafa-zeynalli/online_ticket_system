@@ -1,7 +1,6 @@
 package com.example.online_ticketing_system.domain.model;
 
 
-import com.example.online_ticketing_system.domain.enums.PaymentMethod;
 import com.example.online_ticketing_system.domain.enums.PaymentTicketStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
