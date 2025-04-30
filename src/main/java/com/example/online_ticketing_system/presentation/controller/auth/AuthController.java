@@ -1,4 +1,4 @@
-package com.example.online_ticketing_system.adapter.controller.auth;
+package com.example.online_ticketing_system.presentation.controller.auth;
 
 
 import com.example.online_ticketing_system.application.dto.auth.LoginRequest;

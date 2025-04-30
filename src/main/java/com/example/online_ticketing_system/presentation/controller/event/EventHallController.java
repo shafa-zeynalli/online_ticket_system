@@ -1,4 +1,4 @@
-package com.example.online_ticketing_system.adapter.controller.event;
+package com.example.online_ticketing_system.presentation.controller.event;
 
 
 import com.example.online_ticketing_system.application.dto.event.event_hall.EventHallCreateDTO;

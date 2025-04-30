@@ -3,9 +3,7 @@ package com.example.online_ticketing_system.domain.model;
 
 import com.example.online_ticketing_system.domain.enums.TicketStatus;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -19,6 +17,8 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @SQLDelete(sql = "UPDATE tickets SET deleted_at = NOW() WHERE id=?")
 @Where(clause = "deleted_at IS NULL")
+@Builder
+@AllArgsConstructor
 public class Ticket extends BaseEntity{
 
     @Column(name ="purchase_date")
@@ -31,6 +31,10 @@ public class Ticket extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "seat_lock_id")
+    private SeatLock seatLock;
 
     @ManyToOne
     @JoinColumn(name = "ticket_type_id", nullable = false)

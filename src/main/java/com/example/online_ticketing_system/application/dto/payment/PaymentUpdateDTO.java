@@ -1,21 +1,25 @@
-package com.example.online_ticketing_system.application.dto;
+package com.example.online_ticketing_system.application.dto.payment;
 
 import com.example.online_ticketing_system.application.dto.ticket.TicketResponseDTO;
 import com.example.online_ticketing_system.domain.enums.PaymentMethod;
 import com.example.online_ticketing_system.domain.enums.PaymentStatus;
-import lombok.Getter;
-import lombok.Setter;
+import com.example.online_ticketing_system.domain.model.PaymentTicket;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
-public class PaymentDTO {
-    private BigDecimal amount;
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class PaymentUpdateDTO {
+    private BigDecimal totalAmount;
     private LocalDateTime paidAt;
-
-    private TicketResponseDTO ticket;
     private PaymentMethod method;
     private PaymentStatus status;
+
+    private List<PaymentTicket> tickets;
  }

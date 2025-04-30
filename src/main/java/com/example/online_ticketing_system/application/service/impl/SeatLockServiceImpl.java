@@ -1,6 +1,7 @@
 package com.example.online_ticketing_system.application.service.impl;
 
 import com.example.online_ticketing_system.application.dto.seat_lock.SeatLockCreateDTO;
+import com.example.online_ticketing_system.application.dto.seat_lock.SeatLockResponseDTO;
 import com.example.online_ticketing_system.application.mapper.SeatLockMapper;
 import com.example.online_ticketing_system.domain.exception.ResourceNotFoundException;
 import com.example.online_ticketing_system.domain.exception.SeatAlreadyLockedException;
@@ -39,7 +40,7 @@ public class SeatLockServiceImpl implements SeatLockService {
     }
 
     @Override
-    public void lockSeat(SeatLockCreateDTO dto, @AuthenticationPrincipal User user) {
+    public SeatLock lockSeat(SeatLockCreateDTO dto, @AuthenticationPrincipal User user) {
         if (isSeatLocked(dto.getSeatNumber(), dto.getEventId())) {
             throw new SeatAlreadyLockedException("Seat already locked");
         }
@@ -52,7 +53,7 @@ public class SeatLockServiceImpl implements SeatLockService {
         seatLock.setExpiresAt(LocalDateTime.now().plusMinutes(1));
         seatLock.setReason("Temporary");
 
-        seatLockRepository.save(seatLock);
+        return  seatLockRepository.save(seatLock);
     }
 
     @Override

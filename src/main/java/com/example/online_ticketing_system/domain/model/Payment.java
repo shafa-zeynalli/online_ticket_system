@@ -12,6 +12,7 @@ import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @Setter
@@ -23,7 +24,7 @@ import java.time.LocalDateTime;
 public class Payment extends BaseEntity {
 
     @Column(nullable = false)
-    private BigDecimal amount;
+    private BigDecimal totalAmount;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
@@ -40,6 +41,8 @@ public class Payment extends BaseEntity {
     @Column(nullable = false)
     private PaymentStatus status;
 
+    @OneToMany(mappedBy = "payment", fetch = FetchType.LAZY)
+    private List<PaymentTicket> paymentTickets;
 
 //    layihede her hansi odeme inteqrasiyasi olmadigi ucun helelik bu column lazim deyil
 //    @Column(name = "transaction_id", unique = true)

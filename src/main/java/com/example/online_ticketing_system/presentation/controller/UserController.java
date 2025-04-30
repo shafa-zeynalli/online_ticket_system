@@ -1,4 +1,4 @@
-package com.example.online_ticketing_system.adapter.controller;
+package com.example.online_ticketing_system.presentation.controller;
 
 
 import com.example.online_ticketing_system.application.dto.user.UserCreateDTO;

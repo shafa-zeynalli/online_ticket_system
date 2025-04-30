@@ -30,8 +30,8 @@ public class SeatLockRepositoryImpl implements SeatLockRepository {
     }
 
     @Override
-    public void save(SeatLock seatLock) {
-        jpaRepository.save(seatLock);
+    public SeatLock save(SeatLock seatLock) {
+        return jpaRepository.save(seatLock);
     }
 
     @Override

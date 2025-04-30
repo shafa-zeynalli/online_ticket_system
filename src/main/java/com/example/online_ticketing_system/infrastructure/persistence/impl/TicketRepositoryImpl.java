@@ -1,5 +1,6 @@
 package com.example.online_ticketing_system.infrastructure.persistence.impl;
 
+import com.example.online_ticketing_system.domain.enums.TicketStatus;
 import com.example.online_ticketing_system.domain.model.Ticket;
 import com.example.online_ticketing_system.domain.repository.TicketRepository;
 import com.example.online_ticketing_system.infrastructure.persistence.repository.TicketJpaRepository;
@@ -20,6 +21,11 @@ public class TicketRepositoryImpl implements TicketRepository {
     @Override
     public List<Ticket> findAll() {
         return ticketJpaRepository.findAll();
+    }
+
+    @Override
+    public List<Ticket> findAllById(List<Long> ticketIds) {
+        return ticketJpaRepository.findAllById(ticketIds);
     }
 
     @Override

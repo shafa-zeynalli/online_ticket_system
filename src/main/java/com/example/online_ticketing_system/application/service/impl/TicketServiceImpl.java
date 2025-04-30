@@ -1,6 +1,7 @@
 package com.example.online_ticketing_system.application.service.impl;
 
 import com.example.online_ticketing_system.application.dto.seat_lock.SeatLockCreateDTO;
+import com.example.online_ticketing_system.application.dto.seat_lock.SeatLockResponseDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketCreateDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketResponseDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketUpdateDTO;
@@ -86,7 +87,7 @@ public class TicketServiceImpl implements TicketService {
                 .status(SeatLockStatus.LOCKED)
                 .build();
 
-        seatLockService.lockSeat(seatLockCreateDTO, user);
+        ticket.setSeatLock(seatLockService.lockSeat(seatLockCreateDTO, user));
 
         return ticketMapper.toDTO(ticketRepository.save(ticket));
     }
@@ -104,15 +105,33 @@ public class TicketServiceImpl implements TicketService {
         EventTicketType eventTicketType = eventTicketTypeRepository.findById(ticketUpdateDTO.getTicketTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket type not found!"));
 
-        if (seatLockService.isSeatLocked(ticketUpdateDTO.getSeatNumber(), currentTicket.getEvent().getId())) {
+        boolean seatChanged = !currentTicket.getSeatNumber().equals(ticketUpdateDTO.getSeatNumber());
+        if (seatChanged && seatLockService.isSeatLocked(ticketUpdateDTO.getSeatNumber(), currentTicket.getEvent().getId())) {
             throw new SeatAlreadyLockedException("Seat is already locked for this event!");
         }
 
-        ticketMapper.updateEntityFromDTO(ticketUpdateDTO,currentTicket);
+        if (seatChanged && currentTicket.getSeatLock() != null) {
+            currentTicket.getSeatLock().setStatus(SeatLockStatus.EXPIRED);
+        }
 
+        ticketMapper.updateEntityFromDTO(ticketUpdateDTO,currentTicket);
         currentTicket.setEvent(event);
         currentTicket.setTicketType(eventTicketType);
         currentTicket.setPurchaseDate(LocalDateTime.now());
+
+        if (!currentTicket.getSeatNumber().equals(ticketUpdateDTO.getSeatNumber())) {
+            SeatLockCreateDTO seatLockCreateDTO = SeatLockCreateDTO.builder()
+                    .seatNumber(ticketUpdateDTO.getSeatNumber())
+                    .eventId(ticketUpdateDTO.getEventId())
+                    .reason("Seat updated")
+                    .userId(user.getId())
+                    .lockedAt(LocalDateTime.now())
+                    .expiresAt(LocalDateTime.now().plusMinutes(1))
+                    .status(SeatLockStatus.LOCKED)
+                    .build();
+
+            currentTicket.setSeatLock(seatLockService.lockSeat(seatLockCreateDTO, user));
+        }
 
         return  ticketMapper.toDTO(ticketRepository.save(currentTicket));
     }
@@ -122,6 +141,11 @@ public class TicketServiceImpl implements TicketService {
         Ticket ticket = ticketRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ticket not found!"));
         seatLockService.unlockSeat(ticket.getSeatNumber(),ticket.getEvent().getId(),ticket.getUser().getId());
+
+        if (ticket.getSeatLock() != null) {
+            ticket.getSeatLock().setStatus(SeatLockStatus.EXPIRED);
+        }
+
         if (ticket.getDeletedAt() != null) {
             throw new AlreadyDeletedException("Ticket deleted at " + ticket.getDeletedAt());
         }

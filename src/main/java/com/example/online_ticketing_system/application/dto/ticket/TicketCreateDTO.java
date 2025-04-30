@@ -18,6 +18,7 @@ public class TicketCreateDTO {
 
     private Long eventId;
     private Long ticketTypeId;
+    private Long SeatLockId;
 
     private TicketStatus status;
 }
