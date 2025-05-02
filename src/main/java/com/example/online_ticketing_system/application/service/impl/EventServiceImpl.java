@@ -58,6 +58,7 @@ public class EventServiceImpl implements EventService {
 
     public EventResponseDTO create(EventCreateDTO eventCreateDTO) {
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
         User currentUser = userRepository.findByUsername(username)
                 .orElseThrow(()-> new ResourceNotFoundException("User not found!"));
 
