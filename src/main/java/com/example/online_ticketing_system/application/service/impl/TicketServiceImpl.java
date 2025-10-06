@@ -1,7 +1,6 @@
 package com.example.online_ticketing_system.application.service.impl;
 
 import com.example.online_ticketing_system.application.dto.seat_lock.SeatLockCreateDTO;
-import com.example.online_ticketing_system.application.dto.seat_lock.SeatLockResponseDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketCreateDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketResponseDTO;
 import com.example.online_ticketing_system.application.dto.ticket.TicketUpdateDTO;
