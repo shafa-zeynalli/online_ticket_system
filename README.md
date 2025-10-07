@@ -37,4 +37,4 @@ It provides REST APIs for efficiently managing **events, tickets, and bookings**
 
 The REST API is fully documented in **Postman**. Access it here:
 
-[➡️ Open Postman Collection]([https://www.postman.com/shafa-zeynalli/workspace/online-ticketing-system](https://documenter.getpostman.com/view/25530633/2sB3QJPAt8#cefdc38a-4456-427b-8ba9-1131e25d3b56))
+[➡️ Open Postman Collection](https://documenter.getpostman.com/view/25530633/2sB3QJPAt8#cefdc38a-4456-427b-8ba9-1131e25d3b56)
