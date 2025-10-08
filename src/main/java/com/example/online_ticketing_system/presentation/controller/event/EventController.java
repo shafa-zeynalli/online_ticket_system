@@ -5,6 +5,7 @@ import com.example.online_ticketing_system.application.dto.event.EventCreateDTO;
 import com.example.online_ticketing_system.application.dto.event.EventResponseDTO;
 import com.example.online_ticketing_system.application.dto.event.EventUpdateDTO;
 import com.example.online_ticketing_system.domain.service.EventService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +40,7 @@ public class EventController {
         return eventService.update(id,eventUpdateDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deleteEventById(@PathVariable Long id) {
         eventService.delete(id);

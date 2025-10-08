@@ -5,6 +5,7 @@ import com.example.online_ticketing_system.application.dto.payment.PaymentRespon
 import com.example.online_ticketing_system.application.dto.payment.PaymentUpdateDTO;
 import com.example.online_ticketing_system.domain.model.User;
 import com.example.online_ticketing_system.domain.service.PaymentService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,6 +40,7 @@ public class PaymentController {
         return paymentService.create(paymentDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deletePaymentById(@PathVariable("id") Long id) {
          paymentService.delete(id);

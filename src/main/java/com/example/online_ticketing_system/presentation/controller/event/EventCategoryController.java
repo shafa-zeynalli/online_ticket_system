@@ -8,6 +8,7 @@ import com.example.online_ticketing_system.application.mapper.EventCategoryMappe
 import com.example.online_ticketing_system.domain.repository.EventCategoryRepository;
 import com.example.online_ticketing_system.domain.service.EventCategoryService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,6 +38,7 @@ public class EventCategoryController {
         return Optional.ofNullable(eventCategoryService.findById(id)).map(eventCategoryMapper::toResponseDTO).orElse(null);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public EventCategoryResponseDTO create(@RequestBody EventCategoryCreateDTO eventCategoryCreateDTO) {
         return eventCategoryMapper.toResponseDTO(

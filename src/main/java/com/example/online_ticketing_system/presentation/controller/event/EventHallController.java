@@ -6,6 +6,7 @@ import com.example.online_ticketing_system.application.dto.event.event_hall.Even
 import com.example.online_ticketing_system.application.dto.event.event_hall.EventHallUpdateDTO;
 import com.example.online_ticketing_system.domain.service.EventHallService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class EventHallController {
         return eventHallService.getEventHallById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public EventHallResponseDTO create(@RequestBody EventHallCreateDTO eventHallCreateDTO) {
         return eventHallService.createEventHall(eventHallCreateDTO);
@@ -40,6 +42,7 @@ public class EventHallController {
         return eventHallService.update(id, eventHallUpdateDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
          eventHallService.delete(id);

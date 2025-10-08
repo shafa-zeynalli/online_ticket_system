@@ -5,6 +5,7 @@ import com.example.online_ticketing_system.infrastructure.config.JwtFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -17,6 +18,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtFilter jwtFilter;
@@ -36,8 +38,8 @@ public class SecurityConfig {
 //                        .requestMatchers("/api/user/**").hasRole("USER")
 //                        .permitAll()
 //                        .anyRequest().authenticated()
-                );
-//                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+                )
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
@@ -50,10 +52,15 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> userRepository.findByUsername(username)
-                .map(user-> User.withUsername(user.getUsername())
-                        .password(user.getPassword())
-                        .build()
-                )
+                .map(user -> {
+                    String role = user.getRole().name(); // Enum → String
+                    return org.springframework.security.core.userdetails.User
+                            .withUsername(user.getUsername())
+                            .password(user.getPassword())
+                            .roles(role.replace("ROLE_", ""))
+                            .build();
+                })
                 .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
+
 }

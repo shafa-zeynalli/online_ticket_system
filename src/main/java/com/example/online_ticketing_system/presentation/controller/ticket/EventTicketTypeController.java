@@ -6,6 +6,7 @@ import com.example.online_ticketing_system.application.dto.ticket.ticket_type.Ev
 import com.example.online_ticketing_system.application.dto.ticket.ticket_type.EventTicketTypeUpdateDTO;
 import com.example.online_ticketing_system.domain.service.EventTicketTypeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class EventTicketTypeController {
         return eventTicketTypeService.findById(id);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public EventTicketTypeResponseDTO postEventTicketType(@RequestBody EventTicketTypeCreateDTO eventTicketTypeCreateDTO) {
         return eventTicketTypeService.create(eventTicketTypeCreateDTO);

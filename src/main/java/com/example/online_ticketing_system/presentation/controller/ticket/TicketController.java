@@ -6,6 +6,7 @@ import com.example.online_ticketing_system.application.dto.ticket.TicketResponse
 import com.example.online_ticketing_system.application.dto.ticket.TicketUpdateDTO;
 import com.example.online_ticketing_system.domain.service.TicketService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -41,6 +42,7 @@ public class TicketController {
         return ticketService.saveTicket(ticketCreateDTO);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public TicketResponseDTO updateTicket(@PathVariable Long id,@RequestBody TicketUpdateDTO ticketUpdateDTO) {
         return ticketService.updateTicket(id, ticketUpdateDTO);
